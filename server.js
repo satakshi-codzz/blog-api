@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import postRoutes from "./routes/post.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import "dotenv/config";
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/categories", categoryRoutes);
 app.use("/posts", postRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/comments", commentRoutes);
+app.use("/users", userRoutes);
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("Mongodb is connected successfully"))

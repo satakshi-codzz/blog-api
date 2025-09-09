@@ -22,10 +22,30 @@ export async function createPost(req, res) {
 // Get all posts 
 export async function getPosts(req, res) {
     try{
+        // default page = 1, default limit = 10
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        // calculate how many to skip
+        const skip = (page - 1) * limit;
+
+        // total count for frontend pagination 
+        const total = await Post.countDocuments();
+
         const posts = await Post.find()
         .populate("author", "username email")
-        .populate("categories", "name");
-        res.json(posts);
+        .populate("categories", "name")
+        .skip(skip)
+        .limit(limit)
+        .sort({createdAt: -1});
+        
+          res.json({
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            posts
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -83,6 +103,52 @@ export async function deletePost (req, res) {
 
         await post.deleteOne();
         res.json({message: "Post Deleted"});
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+// controllers/post.controller.js
+
+// Like Post
+export async function likePost(req, res) {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ message: "Post not found" });
+
+        // If user already liked, remove the like (toggle)
+        if (post.likes.includes(req.user.id)) {
+            post.likes.pull(req.user.id);
+        } else {
+            post.likes.push(req.user.id);
+            // Remove dislike if present
+            post.dislikes.pull(req.user.id);
+        }
+
+        await post.save();
+        res.json({ likes: post.likes.length, dislikes: post.dislikes.length });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+// Dislike Post
+export async function dislikePost(req, res) {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ message: "Post not found" });
+
+        // If user already disliked, remove the dislike (toggle)
+        if (post.dislikes.includes(req.user.id)) {
+            post.dislikes.pull(req.user.id);
+        } else {
+            post.dislikes.push(req.user.id);
+            // Remove like if present
+            post.likes.pull(req.user.id);
+        }
+
+        await post.save();
+        res.json({ likes: post.likes.length, dislikes: post.dislikes.length });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

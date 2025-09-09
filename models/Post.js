@@ -5,6 +5,8 @@ const postSchema = new mongoose.Schema({
     content: {type: String, required:true, },
     author: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     categories: [{type: mongoose.Schema.Types.ObjectId, ref: "Category"}],
+    likes: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+    dislikes: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     image:{type: String}
 }, {timestamps: true});
 
