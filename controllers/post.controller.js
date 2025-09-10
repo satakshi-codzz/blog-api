@@ -108,8 +108,6 @@ export async function deletePost (req, res) {
     }
 }
 
-// controllers/post.controller.js
-
 // Like Post
 export async function likePost(req, res) {
     try {

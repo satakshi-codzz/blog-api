@@ -5,6 +5,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import postRoutes from "./routes/post.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import cors from "cors";
 import "dotenv/config";
 
 const app = express();
@@ -15,6 +16,10 @@ const { PORT, MONGO_URI } = process.env;
 app.get("/", (req, res) => {
     res.send("The blog server is running");
 });
+
+
+app.use(cors({ origin: "http://localhost:3000" }));
+
 
 app.use("/auth", authRoutes);
 app.use("/categories", categoryRoutes);
